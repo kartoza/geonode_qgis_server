@@ -2,6 +2,7 @@
 import logging
 import shutil
 import os
+from urllib2 import urlopen
 from django.db.models import signals
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -114,6 +115,26 @@ def qgis_server_post_save(instance, sender, **kwargs):
                         link_type='data'
                 )
             )
+
+    # Create the QGIS Project
+    qgis_server = settings.QGIS_SERVER_CONFIG['qgis_server_url']
+    basename, _ = os.path.splitext(qgis_layer.base_layer_path)
+    query_string = {
+        'SERVICE': 'MAPCOMPOSITION',
+        'PROJECT': '%s.qgs' % basename,
+        'FILES': qgis_layer.base_layer_path,
+        'NAMES': instance.name
+    }
+
+    url = qgis_server + '?'
+    for param, value in query_string.iteritems():
+        url += param + '=' + value + '&'
+    url = url[:-1]
+
+    data = urlopen(url).read()
+    logger.debug('Creating the QGIS Project : %s' % url)
+    if data != 'OK':
+        logger.debug('Result : %s' % data)
 
     tile_url = reverse(
             'qgis-server-tile',
