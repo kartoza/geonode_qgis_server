@@ -1,2 +1,1 @@
-GeoNode>=2.4
 # Additional requirements go here
