@@ -77,7 +77,8 @@ def download_zip(request, layername):
     zf.close()
 
     # Grab ZIP file from in-memory, make response with correct MIME-type
-    resp = HttpResponse(s.getvalue(), mimetype = "application/x-zip-compressed")
+    resp = HttpResponse(
+        s.getvalue(), content_type="application/x-zip-compressed")
     # ..and correct content-disposition
     resp['Content-Disposition'] = 'attachment; filename=%s' % zip_filename
 
@@ -122,8 +123,8 @@ def legend(request, layername, layertitle=None):
             'LAYERTITLE': layertitle,
             'FORMAT': 'image/png',
             'TILED': 'true',
-            'transparent': 'true',
-            'legend_options': 'fontAntiAliasing:true;fontSize:11;fontName:Arial'
+            'TRANSPARENT': 'true',
+            'LEGEND_OPTIONS': 'fontAntiAliasing:true;fontSize:11;fontName:Arial'
         }
 
         url = qgis_server + '?'
@@ -131,6 +132,7 @@ def legend(request, layername, layertitle=None):
             url += param + '=' + value + '&'
 
         urlretrieve(url, legend_filename)
+        logger.info(url)
 
         if image_format(legend_filename) != 'png':
             logger.error('%s is not valid PNG.' % legend_filename)
@@ -140,7 +142,7 @@ def legend(request, layername, layertitle=None):
         return HttpResponse('The legend could not be found.', status=409)
 
     with open(legend_filename, 'rb') as f:
-        return HttpResponse(f.read(), mimetype='image/png')
+        return HttpResponse(f.read(), content_type='image/png')
 
 
 def thumbnail(request, layername):
@@ -214,6 +216,7 @@ def thumbnail(request, layername):
             url += param + '=' + value + '&'
 
         urlretrieve(url, thumbnail_filename)
+        logger.info(url)
 
         if image_format(thumbnail_filename) != 'png':
             logger.error('%s is not valid PNG.' % thumbnail_filename)
@@ -224,7 +227,7 @@ def thumbnail(request, layername):
             return HttpResponse(msg, status=409)
 
     with open(thumbnail_filename, 'rb') as f:
-        return HttpResponse(f.read(), mimetype='image/png')
+        return HttpResponse(f.read(), content_type='image/png')
 
 
 def tile(request, layername, z, x, y):
@@ -294,7 +297,7 @@ def tile(request, layername, z, x, y):
         return HttpResponse('The legend could not be found.', status=409)
 
     with open(tile_filename, 'rb') as f:
-        return HttpResponse(f.read(), mimetype='image/png')
+        return HttpResponse(f.read(), content_type='image/png')
 
 
 def wms_get_map(params):
@@ -344,7 +347,7 @@ def wms_get_map(params):
         return HttpResponse('The legend could not be found.', status=409)
 
     with open(tile_filename, 'rb') as f:
-        return HttpResponse(f.read(), mimetype='image/png')
+        return HttpResponse(f.read(), content_type='image/png')
 
 
 def wms_describe_layer(params):
@@ -377,7 +380,7 @@ def wms_describe_layer(params):
     result = urllib2.urlopen(url)
     result_list = result.readlines()
     return HttpResponse(
-        ''.join(result_list).replace('\n', ''), mimetype='text/xml')
+        ''.join(result_list).replace('\n', ''), content_type='text/xml')
 
 
 def wfs_describe_feature_type(params):
@@ -406,7 +409,7 @@ def wfs_describe_feature_type(params):
     result = urllib2.urlopen(url)
     result_list = result.readlines()
     return HttpResponse(
-        ''.join(result_list).replace('\n', ''), mimetype='text/xml')
+        ''.join(result_list).replace('\n', ''), content_type='text/xml')
 
 
 def wms_get_feature_info(params):
@@ -438,7 +441,7 @@ def wms_get_feature_info(params):
     result = urllib2.urlopen(url)
     result_list = result.readlines()
     return HttpResponse(
-        ''.join(result_list).replace('\n', ''), mimetype='text/xml')
+        ''.join(result_list).replace('\n', ''), content_type='text/xml')
 
 
 def qgis_server_request(request):
