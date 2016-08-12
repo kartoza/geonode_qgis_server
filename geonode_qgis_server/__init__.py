@@ -5,3 +5,4 @@ __date__ = '1/19/16'
 __copyright__ = 'imajimatika@gmail.com'
 
 
+__version__ = '0.1.0'
