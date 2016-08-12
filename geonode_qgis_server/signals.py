@@ -7,16 +7,16 @@ from django.db.models import signals
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
-from geonode.qgis_server.models import QGISServerLayer
+from geonode_qgis_server.models import QGISServerLayer
 from geonode.base.models import ResourceBase, Link
 from geonode.layers.models import Layer
 from geonode.maps.models import Map, MapLayer
 from geonode.layers.utils import create_thumbnail
 from geonode.geoserver.helpers import http_client
-from geonode.qgis_server.gis_tools import set_attributes
+from geonode_qgis_server.gis_tools import set_attributes
 
 
-logger = logging.getLogger("geonode.qgis_server.signals")
+logger = logging.getLogger("geonode_qgis_server.signals")
 QGIS_layer_directory = settings.QGIS_SERVER_CONFIG['layer_directory']
 
 
