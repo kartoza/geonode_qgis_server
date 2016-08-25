@@ -2,8 +2,9 @@
 import logging
 import shutil
 import os
-from urllib2 import urlopen
-from django.db.models import signals
+from urllib2 import urlopen, quote
+from django.db.models import signals, ObjectDoesNotExist
+from django.dispatch import Signal
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
@@ -18,6 +19,8 @@ from geonode_qgis_server.gis_tools import set_attributes
 
 logger = logging.getLogger("geonode_qgis_server.signals")
 QGIS_layer_directory = settings.QGIS_SERVER_CONFIG['layer_directory']
+
+qgis_map_with_layers = Signal(providing_args=[])
 
 
 def qgis_server_layer_pre_delete(instance, sender, **kwargs):
@@ -192,16 +195,48 @@ def qgis_server_pre_save_maplayer(instance, sender, **kwargs):
         pass
 
 
+def qgis_server_post_save_map(sender, **kwargs):
+    logger.debug('QGIS Server Post Save Map custom')
+    map_id = sender.id
+    map_layers = MapLayer.objects.filter(map__id=map_id)
+    local_layers = [l for l in map_layers if l.local]
 
-def qgis_server_post_save_map(instance, sender, **kwargs):
+    names = []
+    files = []
+    for layer in local_layers:
+        l = Layer.objects.get(typename=layer.name)
+        names.append(l.title)
 
-    logger.debug('QGIS Server Post Save Map')
+        try:
+            qgis_layer = QGISServerLayer.objects.get(layer=l)
+            files.append(qgis_layer.base_layer_path)
+        except ObjectDoesNotExist:
+            msg = 'No QGIS Server Layer for existing layer %s' % l.title
+            logger.debug(msg)
 
+    # Create the QGIS Project
+    qgis_server = settings.QGIS_SERVER_CONFIG['qgis_server_url']
+    project_path = os.path.join(QGIS_layer_directory, 'map_%s.qgs' % map_id)
+    query_string = {
+        'SERVICE': 'MAPCOMPOSITION',
+        'PROJECT': project_path,
+        'FILES': ';'.join(files),
+        'NAMES': ';'.join(names)
+    }
+
+    url = qgis_server + '?'
+    for param, value in query_string.iteritems():
+        url += param + '=' + quote(value) + '&'
+    url = url[:-1]
+
+    data = urlopen(url).read()
+    logger.debug('Creating the QGIS Project : %s' % project_path)
+    logger.debug('Result : %s' % data)
 
 signals.post_save.connect(qgis_server_post_save, sender=ResourceBase)
 signals.pre_save.connect(qgis_server_pre_save, sender=Layer)
 signals.pre_delete.connect(qgis_server_pre_delete, sender=Layer)
 signals.post_save.connect(qgis_server_post_save, sender=Layer)
 signals.pre_save.connect(qgis_server_pre_save_maplayer, sender=MapLayer)
-signals.post_save.connect(qgis_server_post_save_map, sender=Map)
+qgis_map_with_layers.connect(qgis_server_post_save_map)
 signals.pre_delete.connect(qgis_server_layer_pre_delete, sender=QGISServerLayer)

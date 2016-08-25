@@ -6,6 +6,7 @@ from geonode_qgis_server.views import (
     tile,
     legend,
     thumbnail,
+    map_thumbnail,
     qgis_server_request,
     qgis_server_pdf,
     qgis_server_map_print
@@ -49,6 +50,11 @@ urlpatterns = patterns(
         r'^qgis-server/thumbnail/(?P<layername>[^/]*)$',
         thumbnail,
         name='qgis-server-thumbnail'
+    ),
+    url(
+        r'^qgis-server/map/thumbnail/(?P<map_id>[^/]*)$',
+        map_thumbnail,
+        name='qgis-server-map-thumbnail'
     ),
     url(
         r'^qgis-server/wms/$',
