@@ -233,6 +233,7 @@ def qgis_server_post_save_map(sender, **kwargs):
     logger.debug('Creating the QGIS Project : %s' % project_path)
     logger.debug('Result : %s' % data)
 
+logger.debug('Register signals QGIS Server')
 signals.post_save.connect(qgis_server_post_save, sender=ResourceBase)
 signals.pre_save.connect(qgis_server_pre_save, sender=Layer)
 signals.pre_delete.connect(qgis_server_pre_delete, sender=Layer)

@@ -18,7 +18,7 @@ from geonode.maps.models import Map
 from geonode.layers.models import Layer
 from geonode_qgis_server.models import QGISServerLayer
 from geonode_qgis_server.gis_tools import num2deg
-from geonode.settings import QGIS_SERVER_CONFIG
+from django.conf import settings
 
 __author__ = 'ismailsunni'
 __project_name__ = 'geonode'
@@ -27,6 +27,8 @@ __date__ = '1/29/16'
 __copyright__ = 'imajimatika@gmail.com'
 
 logger = logging.getLogger('geonode_qgis_server.views')
+
+QGIS_SERVER_CONFIG = settings.QGIS_SERVER_CONFIG
 
 
 def download_zip(request, layername):
