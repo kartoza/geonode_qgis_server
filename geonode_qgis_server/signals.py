@@ -179,7 +179,11 @@ def qgis_server_post_save(instance, sender, **kwargs):
     thumbnail_remote_url += reverse(
         'qgis-server-thumbnail', kwargs={'layername': instance.name})
     logger.debug(thumbnail_remote_url)
-    create_thumbnail(instance, thumbnail_remote_url, ogc_client=http_client)
+
+    from geonode_qgis_server.tasks.update import create_qgis_server_thumbnail
+
+    create_qgis_server_thumbnail.delay(
+        instance, thumbnail_remote_url, ogc_client=http_client)
 
     # Attributes
     set_attributes(instance)
