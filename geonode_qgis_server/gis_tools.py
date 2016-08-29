@@ -6,7 +6,7 @@ from os.path import splitext
 from math import atan, degrees, sinh, pi
 from lxml import etree
 
-from geonode import settings as geonode_config
+from django.conf import settings as geonode_config
 from geonode.layers.models import Attribute
 from geonode_qgis_server.models import QGISServerLayer
 
