@@ -175,8 +175,7 @@ def qgis_server_post_save(instance, sender, **kwargs):
     )
 
     # Create thumbnail
-    thumbnail_remote_url = settings.SITEURL[:-1]
-    thumbnail_remote_url += reverse(
+    thumbnail_remote_url = reverse(
         'qgis-server-thumbnail', kwargs={'layername': instance.name})
     logger.debug(thumbnail_remote_url)
 

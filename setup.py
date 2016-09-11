@@ -48,7 +48,7 @@ setup(
     long_description=readme + '\n\n' + history,
     author='Ismail Sunni',
     author_email='imajimatika@gmail.com',
-    url='https://github.com/ismailsunni/geonode_qgis_server',
+    url='https://github.com/kartoza/geonode_qgis_server',
     packages=[
         'geonode_qgis_server',
     ],

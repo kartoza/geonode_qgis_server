@@ -5,8 +5,8 @@ geonode_qgis_server
 .. image:: https://badge.fury.io/py/geonode_qgis_server.png
     :target: https://badge.fury.io/py/geonode_qgis_server
 
-.. image:: https://travis-ci.org/ismailsunni/geonode_qgis_server.png?branch=master
-    :target: https://travis-ci.org/ismailsunni/geonode_qgis_server
+.. image:: https://travis-ci.org/kartoza/geonode_qgis_server.png?branch=master
+    :target: https://travis-ci.org/kartoza/geonode_qgis_server
 
 Django app to enable QGIS Server in GeoNode.
 
