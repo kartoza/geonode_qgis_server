@@ -13,6 +13,8 @@ from django.http import HttpResponse, Http404
 from django.db.models import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
+from django.contrib.gis.gdal import SpatialReference, CoordTransform
+from django.contrib.gis.geos import Point
 
 from geonode.maps.models import Map
 from geonode.layers.models import Layer
@@ -346,7 +348,21 @@ def tile(request, layername, z, x, y):
         # Call the WMS
         top, left = num2deg(x, y, z)
         bottom, right = num2deg(x + 1, y + 1, z)
-        bbox = ','.join([str(val) for val in [bottom, left, top, right]])
+
+        transform = CoordTransform(
+            SpatialReference(4326), SpatialReference(3857))
+        top_left_corner = Point(left, top, srid=4326)
+        bottom_right_corner = Point(right, bottom, srid=4326)
+        top_left_corner.transform(transform)
+        bottom_right_corner.transform(transform)
+
+        bottom = bottom_right_corner.y
+        right = bottom_right_corner.x
+        top = top_left_corner.y
+        left = top_left_corner.x
+
+        bbox = ','.join([str(val) for val in [left, bottom, right, top]])
+
 
         qgis_server = QGIS_SERVER_CONFIG['qgis_server_url']
         query_string = {
@@ -354,7 +370,7 @@ def tile(request, layername, z, x, y):
             'VERSION': '1.3.0',
             'REQUEST': 'GetMap',
             'BBOX': bbox,
-            'CRS': 'EPSG:4326',
+            'CRS': 'EPSG:3857',
             'WIDTH': '256',
             'HEIGHT': '256',
             'MAP': basename + '.qgs',
