@@ -9,7 +9,7 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding model 'QGISServerLayer'
-        db.create_table(u'qgis_server_qgisserverlayer', (
+        db.create_table(u'geonode_qgis_server_qgisserverlayer', (
             ('layer', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['layers.Layer'], unique=True, primary_key=True)),
             ('base_layer_path', self.gf('django.db.models.fields.CharField')(max_length=100)),
         ))
@@ -18,7 +18,7 @@ class Migration(SchemaMigration):
 
     def backwards(self, orm):
         # Deleting model 'QGISServerLayer'
-        db.delete_table(u'qgis_server_qgisserverlayer')
+        db.delete_table(u'geonode_qgis_server_qgisserverlayer')
 
 
     models = {
