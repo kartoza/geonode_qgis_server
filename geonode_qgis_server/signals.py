@@ -189,7 +189,7 @@ def qgis_server_post_save(instance, sender, **kwargs):
 
 
 def qgis_server_pre_save_maplayer(instance, sender, **kwargs):
-    logger.debug('QGIS Server Pre Save Map Layer')
+    logger.debug('QGIS Server Pre Save Map Layer %s' % instance.name)
     try:
         layer = Layer.objects.get(typename=instance.name)
         if layer:
@@ -198,9 +198,9 @@ def qgis_server_pre_save_maplayer(instance, sender, **kwargs):
         pass
 
 
-def qgis_server_post_save_map(sender, **kwargs):
+def qgis_server_post_save_map(instance, sender, **kwargs):
     logger.debug('QGIS Server Post Save Map custom')
-    map_id = sender.id
+    map_id = instance.id
     map_layers = MapLayer.objects.filter(map__id=map_id)
     local_layers = [l for l in map_layers if l.local]
 
@@ -216,6 +216,10 @@ def qgis_server_post_save_map(sender, **kwargs):
         except ObjectDoesNotExist:
             msg = 'No QGIS Server Layer for existing layer %s' % l.title
             logger.debug(msg)
+
+    if not files:
+        # The signal is called to early, the map has not layer yet.
+        return
 
     # Create the QGIS Project
     qgis_server = settings.QGIS_SERVER_CONFIG['qgis_server_url']
@@ -233,8 +237,7 @@ def qgis_server_post_save_map(sender, **kwargs):
     url = url[:-1]
 
     data = urlopen(url).read()
-    logger.debug('Creating the QGIS Project : %s' % project_path)
-    logger.debug('Result : %s' % data)
+    logger.debug('Creating the QGIS Project : %s -> %s' % (project_path, data))
 
 logger.debug('Register signals QGIS Server')
 signals.post_save.connect(qgis_server_post_save, sender=ResourceBase)
@@ -242,5 +245,5 @@ signals.pre_save.connect(qgis_server_pre_save, sender=Layer)
 signals.pre_delete.connect(qgis_server_pre_delete, sender=Layer)
 signals.post_save.connect(qgis_server_post_save, sender=Layer)
 signals.pre_save.connect(qgis_server_pre_save_maplayer, sender=MapLayer)
-qgis_map_with_layers.connect(qgis_server_post_save_map)
+signals.post_save.connect(qgis_server_post_save_map, sender=Map)
 signals.pre_delete.connect(qgis_server_layer_pre_delete, sender=QGISServerLayer)
