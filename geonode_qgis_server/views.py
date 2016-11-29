@@ -226,7 +226,7 @@ def map_thumbnail(request, map_id):
             return HttpResponse(msg, status=409)
 
     with open(thumbnail_filename, 'rb') as f:
-        return HttpResponse(f.read(), mimetype='image/png')
+        return HttpResponse(f.read(), content_type='image/png')
 
 
 def thumbnail(request, layername):
