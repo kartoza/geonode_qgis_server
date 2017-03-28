@@ -66,7 +66,11 @@ def qgis_server_post_save(instance, sender, **kwargs):
     logger.debug('QGIS Server Post Save')
     qgis_layer, created = QGISServerLayer.objects.get_or_create(layer=instance)
     # copy layer to QGIS Layer Directory
-    geonode_layer_path = instance.get_base_file()[0].file.path
+    try:
+        geonode_layer_path = instance.get_base_file()[0].file.path
+    except AttributeError:
+        logger.debug('Layer does not have base file')
+        return
     logger.debug('Geonode Layer Path %s' % geonode_layer_path)
 
     base_filename, original_ext = os.path.splitext(geonode_layer_path)
