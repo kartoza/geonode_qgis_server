@@ -33,7 +33,7 @@ logger = logging.getLogger('geonode_qgis_server.views')
 QGIS_SERVER_CONFIG = settings.QGIS_SERVER_CONFIG
 
 
-def download_zip(request, layername):
+def download_zip(request, layername, access_token=None):
     try:
         layer = Layer.objects.get(name=layername)
     except ObjectDoesNotExist:
@@ -398,6 +398,41 @@ def tile(request, layername, z, x, y):
 
     with open(tile_filename, 'rb') as f:
         return HttpResponse(f.read(), content_type='image/png')
+
+
+def geotiff(request, layername, access_token=None):
+    try:
+        layer = Layer.objects.get(name=layername)
+    except ObjectDoesNotExist:
+        msg = 'No layer found for %s' % layername
+        logger.debug(msg)
+        raise Http404(msg)
+
+    try:
+        qgis_layer = QGISServerLayer.objects.get(layer=layer)
+    except ObjectDoesNotExist:
+        msg = 'No QGIS Server Layer for existing layer %s' % layername
+        logger.debug(msg)
+        return Http404(msg)
+
+    basename, _ = os.path.splitext(qgis_layer.base_layer_path)
+
+    # get geotiff file if exists
+    for ext in QGISServerLayer.geotiff_format:
+        target_file = basename + '.' + ext
+        if os.path.exists(target_file):
+            filename = target_file
+            break
+    else:
+        filename = None
+
+    if not filename:
+        msg = 'No Geotiff layer found for %s' % layername
+        logger.debug(msg)
+        raise Http404(msg)
+
+    with open(filename, 'rb') as f:
+        return HttpResponse(f.read(), content_type='image/tiff')
 
 
 def wms_get_map(params):
