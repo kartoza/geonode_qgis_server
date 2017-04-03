@@ -22,6 +22,8 @@ class QGISServerLayer(models.Model):
     accepted_format = [
         'tif', 'tiff', 'asc', 'shp', 'shx', 'dbf', 'prj', 'qml', 'xml']
 
+    geotiff_format = ['tif', 'tiff']
+
     layer = models.OneToOneField(
         Layer,
         primary_key=True,

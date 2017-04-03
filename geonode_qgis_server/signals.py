@@ -107,10 +107,14 @@ def qgis_server_post_save(instance, sender, **kwargs):
         )
     qgis_layer.save()
 
+    # base url for geonode
+    base_url = settings.SITEURL
+
     # Set Link for Download Raw in Zip File
     zip_download_url = reverse(
             'qgis-server-download-zip',
             kwargs={'layername': instance.name})
+    zip_download_url = urljoin(base_url, zip_download_url)
     logger.debug('zip_download_url: %s' % zip_download_url)
     Link.objects.get_or_create(
             resource=instance.resourcebase_ptr,
@@ -147,6 +151,7 @@ def qgis_server_post_save(instance, sender, **kwargs):
     tile_url = reverse(
             'qgis-server-tile',
             kwargs={'layername': instance.name, 'x': 5678, 'y':910, 'z': 1234})
+    tile_url = urljoin(base_url, tile_url)
     logger.debug('tile_url: %s' % tile_url)
     tile_url = tile_url.replace('1234/5678/910', '{z}/{x}/{y}')
     logger.debug('tile_url: %s' % tile_url)
@@ -162,11 +167,29 @@ def qgis_server_post_save(instance, sender, **kwargs):
         )
     )
 
+    # geotiff link
+    geotiff_url = reverse(
+        'qgis-server-geotiff', kwargs={'layername': instance.name})
+    geotiff_url = urljoin(base_url, geotiff_url)
+    logger.debug('geotif_url: %s' % geotiff_url)
+
+    Link.objects.get_or_create(
+        resource=instance.resourcebase_ptr,
+        url=geotiff_url,
+        defaults=dict(
+            extension='tif',
+            name="GeoTIFF",
+            mime='image/tif',
+            link_type='image'
+        )
+    )
+
     # Create legend link
     legend_url = reverse(
         'qgis-server-legend',
         kwargs={'layername': instance.name}
     )
+    legend_url = urljoin(base_url, legend_url)
     Link.objects.get_or_create(
         resource=instance.resourcebase_ptr,
         url=legend_url,
@@ -182,7 +205,6 @@ def qgis_server_post_save(instance, sender, **kwargs):
     # Create thumbnail
     thumbnail_remote_url = reverse(
         'qgis-server-thumbnail', kwargs={'layername': instance.name})
-    base_url = settings.SITEURL
     thumbnail_remote_url = urljoin(base_url, thumbnail_remote_url)
     logger.debug(thumbnail_remote_url)
 
