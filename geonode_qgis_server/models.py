@@ -15,12 +15,13 @@ QGIS_TILES_DIRECTORY = settings.QGIS_SERVER_CONFIG['tiles_directory']
 if not os.path.exists(QGIS_LAYER_DIRECTORY):
     os.mkdir(QGIS_LAYER_DIRECTORY)
 
+
 class QGISServerLayer(models.Model):
     """Model for Layer in QGIS Server Backend.
     """
 
     accepted_format = [
-        'tif', 'tiff', 'asc', 'shp', 'shx', 'dbf', 'prj', 'qml', 'xml']
+        'tif', 'tiff', 'asc', 'shp', 'shx', 'dbf', 'prj', 'qml', 'xml', 'qgs']
 
     geotiff_format = ['tif', 'tiff']
 
@@ -51,6 +52,7 @@ class QGISServerLayer(models.Model):
 
         # Removing the cache.
         basename, _ = os.path.splitext(self.base_layer_path)
+        basename = os.path.basename(basename)
         path = os.path.join(QGIS_TILES_DIRECTORY, basename)
         logger.info('Removing the cache from a qgis layer : %s' % path)
         try:
