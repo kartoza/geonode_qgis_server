@@ -90,9 +90,11 @@ def qgis_server_post_save(instance, sender, **kwargs):
                     )
                 else:
                     # If there is already a file, replace the old one
+                    qgis_layer_base_filename, _ = os.path.splitext(
+                        qgis_layer.base_layer_path)
                     shutil.copy2(
                         base_filename + '.' + ext,
-                        qgis_layer.base_layer_path + '.' + ext
+                        qgis_layer_base_filename + '.' + ext
                     )
                 logger.debug('Success')
             except IOError as e:
