@@ -90,7 +90,7 @@ def download_zip(request, layername):
     return resp
 
 
-def legend(request, layername, layertitle=None):
+def legend(request, layername, layertitle=None, access_token=None):
     try:
         layer = Layer.objects.get(name=layername)
     except ObjectDoesNotExist:
