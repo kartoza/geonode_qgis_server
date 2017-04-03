@@ -36,8 +36,10 @@ urlpatterns = patterns(
         name='qgis-server-tile'
     ),
     url(
-        r'^qgis-server/legend/(?P<layername>[^/]*)'
-        r'(?:/(?P<layertitle>[^/]*))?$',
+        r'^qgis-server/legend/(?P<layername>[\w]*)'
+        r'(?:/(?P<layertitle>[\w]*))?'
+        r'[\?]?'
+        r'(?:&access_token=(?P<access_token>[\w]*))?$',
         legend,
         name='qgis-server-legend'
     ),

@@ -3,6 +3,7 @@ import logging
 import shutil
 import os
 from urllib2 import urlopen, quote
+from urlparse import urljoin
 from django.db.models import signals, ObjectDoesNotExist
 from django.dispatch import Signal
 from django.core.urlresolvers import reverse
@@ -181,6 +182,8 @@ def qgis_server_post_save(instance, sender, **kwargs):
     # Create thumbnail
     thumbnail_remote_url = reverse(
         'qgis-server-thumbnail', kwargs={'layername': instance.name})
+    base_url = settings.SITEURL
+    thumbnail_remote_url = urljoin(base_url, thumbnail_remote_url)
     logger.debug(thumbnail_remote_url)
 
     from geonode_qgis_server.tasks.update import create_qgis_server_thumbnail
